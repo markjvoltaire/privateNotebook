@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import UserForm from '../../components/UserForm/UserForm';
 import { useUser } from '../../context/UserContext';
 import { signInUser, signUpUser } from '../../services/users';
+import ConfirmEmail from './ConfirmEmail';
 
 import styles from './Auth.css';
 
@@ -14,8 +15,16 @@ export default function Auth({ isSigningUp = false }) {
     try {
       // TODO: Implement sign up & sign
       // Use isSigningUp to determine whether to sign up or sign in a user
-      // If signing in: set the user ({id, email}) and redirect to /notes
-      // If signing up: redirect to /confirm-email
+      if (isSigningUp) {
+        await signUpUser(email, password);
+        // If signing up: redirect to /confirm-email
+        history.push('/confirm-email');
+      } else {
+        const resp = await signInUser(email, password);
+        // If signing in: set the user ({id, email}) and redirect to /notes
+        setUser({ id: resp.id, email: resp.email });
+        history.push('/notes');
+      }
       // Use the corresponding functions from `/services/users` for both cases
     } catch (error) {
       throw error;
